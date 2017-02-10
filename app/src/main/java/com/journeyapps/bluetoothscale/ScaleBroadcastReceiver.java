@@ -12,11 +12,11 @@ public class ScaleBroadcastReceiver extends BroadcastReceiver {
 
     private static final String TAG = ScaleBroadcastReceiver.class.getSimpleName();
 
-    public static final String SCALE_BROADCAST_ACTION = "com.journeyapps.bluetoothscale.SCALE_BROADCAST_ACTION";
+    public static final String SCALE_BROADCAST_ACTION = "com.journeyapps.bluetoothscale.internal.SCALE_BROADCAST_ACTION";
 
-    public static final String SCALE_BROADCAST_STATE_KEY = "com.journeyapps.bluetoothscale.SCALE_BROADCAST_STATE_KEY";
+    public static final String SCALE_BROADCAST_STATE_KEY = "com.journeyapps.bluetoothscale.internal.SCALE_BROADCAST_STATE_KEY";
 
-    public static final String SCALE_BROADCAST_READING_KEY = "com.journeyapps.bluetoothscale.SCALE_BROADCAST_READING_KEY";
+    public static final String SCALE_BROADCAST_READING_KEY = "com.journeyapps.bluetoothscale.internal.SCALE_BROADCAST_READING_KEY";
 
     private final ScaleUpdateCallback callback;
 

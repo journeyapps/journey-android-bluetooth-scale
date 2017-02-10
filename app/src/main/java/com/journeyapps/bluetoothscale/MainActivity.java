@@ -3,6 +3,7 @@ package com.journeyapps.bluetoothscale;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements ScaleUpdateCallba
 
     private ScaleBroadcastReceiver scaleBroadcastReceiver;
 
+    private Intent scaleBroadcastServiceIntent;
+
     public MainActivity() {
         this.adapter = null;
         this.bluetoothService = null;
@@ -44,6 +47,9 @@ public class MainActivity extends AppCompatActivity implements ScaleUpdateCallba
         this.isZero = (TextView) findViewById(R.id.zero);
         this.isStable = (TextView) findViewById(R.id.stable);
         this.connectionStatus = (TextView) findViewById(R.id.connected);
+
+        scaleBroadcastServiceIntent = new Intent(this, ScaleBroadcastService.class);
+        startService(scaleBroadcastServiceIntent);
     }
 
     public void connectToScale(View view) {
@@ -108,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements ScaleUpdateCallba
     @Override
     public void onStop() {
         super.onStop();
+        stopService(scaleBroadcastServiceIntent);
     }
 
     @Override
