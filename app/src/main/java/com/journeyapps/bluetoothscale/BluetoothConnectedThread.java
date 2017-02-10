@@ -14,6 +14,7 @@ public class BluetoothConnectedThread extends Thread {
     private final OutputStream outputStream;
     private BluetoothService bluetoothService;
     private final static int payloadSize = 11;
+    private final byte[] ZERO_INSTRUCTION_BYTES = new byte[]{0x02, 0x4B, 0x5A, 0x52, 0x40, (byte) 0xB7, 0x0D};
 
     public BluetoothConnectedThread(BluetoothService bluetoothService, BluetoothSocket bluetoothSocket) {
         InputStream inputStream = null;
@@ -35,6 +36,15 @@ public class BluetoothConnectedThread extends Thread {
         }
         this.inputStream = inputStream;
         this.outputStream = outputStream;
+    }
+
+    public void writeZero() {
+        Log.i(TAG, "BluetoothConnectedThread writeZero");
+        try {
+            this.outputStream.write(this.ZERO_INSTRUCTION_BYTES);
+        } catch (Throwable e) {
+            Log.e(TAG, "Could not write", e);
+        }
     }
 
     public final void close() {

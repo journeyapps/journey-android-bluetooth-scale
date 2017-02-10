@@ -85,12 +85,18 @@ public class BluetoothService {
         setState(ConnectionState.CONNECTING);
     }
 
+
     public final synchronized void connected(BluetoothSocket bluetoothSocket) {
         Log.i(TAG, "BluetoothService connected");
         this.close();
         this.bluetoothConnectedThread = new BluetoothConnectedThread(this, bluetoothSocket);
         this.bluetoothConnectedThread.start();
         setState(ConnectionState.CONNECTED);
+    }
+
+    public void writeZero() {
+        Log.i(TAG, "BluetoothService writeZero");
+        this.bluetoothConnectedThread.writeZero();
     }
 
     private synchronized void close() {
