@@ -20,9 +20,8 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements ScaleUpdateCallback {
     private static final String TAG = "JOURNEYAPPSSCALE";
-    private BluetoothAdapter adapter;
-    private BluetoothService bluetoothService;
-    private final Handler handler;
+    private BluetoothAdapter adapter = null;
+    private BluetoothService bluetoothService = null;
 
     private TextView scaleValueText;
     private TextView isZero;
@@ -33,11 +32,6 @@ public class MainActivity extends AppCompatActivity implements ScaleUpdateCallba
 
     private Intent scaleBroadcastServiceIntent;
 
-    public MainActivity() {
-        this.adapter = null;
-        this.bluetoothService = null;
-        this.handler = new BluetoothHandler(this.getApplicationContext());
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +83,8 @@ public class MainActivity extends AppCompatActivity implements ScaleUpdateCallba
     }
 
     private void setupBluetooth() {
-        this.bluetoothService = new BluetoothService(this.handler);
+        BluetoothHandler handler = new BluetoothHandler(this.getApplicationContext());
+        this.bluetoothService = new BluetoothService(handler);
     }
 
     @Override
