@@ -28,7 +28,7 @@ public class ScaleBroadcastService extends Service implements ScaleUpdateCallbac
         /**
          * Key for scale reading object.
          */
-        public static final String SCALE_READING_KEY = "SCALE_READING";
+        public static final String SCALE_READING_KEY = "reading";
 
         // scale reading object property keys
         private static final String SCALE_READING_WEIGHT_KEY = "weight";
