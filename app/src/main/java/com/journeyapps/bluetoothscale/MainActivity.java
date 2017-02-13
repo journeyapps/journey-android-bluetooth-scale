@@ -100,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void writeZero(View view) {
-        this.bluetoothService.writeZero();
+    public void sendZeroInstruction(View view) {
+        this.bluetoothService.sendZeroInstruction();
     }
 
     public void showConnectionStatus(String status) {
