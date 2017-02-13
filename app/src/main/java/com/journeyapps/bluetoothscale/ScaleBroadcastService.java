@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -21,14 +20,27 @@ public class ScaleBroadcastService extends Service implements ScaleUpdateCallbac
     private static final String SCALE_BROADCAST_ACTION = "com.journeyapps.bluetoothscale.SCALE_BROADCAST_ACTION";
 
     /**
+     * Base DTO for scale result data sent in a scale broadcast.
+     */
+    private abstract class ScaleResultWrapper {
+
+        private static final String SCALE_RESULT_MESSAGE_KEY = "message";
+
+        protected abstract String getMessageType();
+
+        public Intent putExtras(Intent intent) {
+            intent.putExtra(SCALE_RESULT_MESSAGE_KEY, getMessageType());
+            return intent;
+        }
+
+    }
+
+    /**
      * DTO for scale reading data sent in a scale broadcast.
      */
-    private class ScaleReadingWrapper {
+    private class ScaleReadingWrapper extends ScaleResultWrapper {
 
-        /**
-         * Key for scale reading object.
-         */
-        public static final String SCALE_READING_KEY = "reading";
+        private static final String SCALE_READING_RESULT_TYPE = "reading";
 
         // scale reading object property keys
         private static final String SCALE_READING_WEIGHT_KEY = "weight";
@@ -44,15 +56,21 @@ public class ScaleBroadcastService extends Service implements ScaleUpdateCallbac
             this.scaleReading = scaleReading;
         }
 
-        public Bundle toBundle() {
-            Bundle bundle = new Bundle();
-            bundle.putDouble(SCALE_READING_WEIGHT_KEY, scaleReading.getWeight());
-            bundle.putString(SCALE_READING_UNIT_KEY, scaleReading.getUnit().toString());
-            bundle.putBoolean(SCALE_READING_FAULT_KEY, scaleReading.isFault());
-            bundle.putBoolean(SCALE_READING_OVERWEIGHT_KEY, scaleReading.isOverweight());
-            bundle.putBoolean(SCALE_READING_STABLE_KEY, scaleReading.isStable());
-            bundle.putBoolean(SCALE_READING_ZERO_KEY, scaleReading.isZero());
-            return bundle;
+        @Override
+        protected String getMessageType() {
+            return SCALE_READING_RESULT_TYPE;
+        }
+
+        @Override
+        public Intent putExtras(Intent intent) {
+            super.putExtras(intent);
+            intent.putExtra(SCALE_READING_WEIGHT_KEY, scaleReading.getWeight());
+            intent.putExtra(SCALE_READING_UNIT_KEY, scaleReading.getUnit().toString());
+            intent.putExtra(SCALE_READING_FAULT_KEY, scaleReading.isFault());
+            intent.putExtra(SCALE_READING_OVERWEIGHT_KEY, scaleReading.isOverweight());
+            intent.putExtra(SCALE_READING_STABLE_KEY, scaleReading.isStable());
+            intent.putExtra(SCALE_READING_ZERO_KEY, scaleReading.isZero());
+            return intent;
         }
 
     }
@@ -126,7 +144,7 @@ public class ScaleBroadcastService extends Service implements ScaleUpdateCallbac
         // send the scale reading as a global broadcast
         Intent broadcastIntent = new Intent(SCALE_BROADCAST_ACTION);
         ScaleReadingWrapper scaleReadingWrapper = new ScaleReadingWrapper(scaleReading);
-        broadcastIntent.putExtra(ScaleReadingWrapper.SCALE_READING_KEY, scaleReadingWrapper.toBundle());
+        scaleReadingWrapper.putExtras(broadcastIntent);
         getContext().sendBroadcast(broadcastIntent);
     }
 }
