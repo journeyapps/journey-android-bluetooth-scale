@@ -108,13 +108,15 @@ public class MainActivity extends AppCompatActivity implements ScaleUpdateCallba
 
     @Override
     public void onStop() {
+        Log.d(TAG, "onStop");
         super.onStop();
-        stopService(scaleBroadcastServiceIntent);
     }
 
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
+        stopService(scaleBroadcastServiceIntent);
         if(this.bluetoothService != null) {
             this.bluetoothService.stop();
         }

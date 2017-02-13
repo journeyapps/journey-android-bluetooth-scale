@@ -96,14 +96,14 @@ public class ScaleBroadcastService extends Service implements ScaleUpdateCallbac
     }
 
     private void registerBroadcastReceiver() {
-        Log.e(TAG, "Registering scale broadcast receiver");
+        Log.d(TAG, "Registering scale broadcast receiver");
         IntentFilter broadcastFilter = new IntentFilter(ScaleBroadcastReceiver.SCALE_BROADCAST_ACTION);
         scaleBroadcastReceiver = new ScaleBroadcastReceiver(getScaleUpdateCallback());
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(scaleBroadcastReceiver, broadcastFilter);
     }
 
     private void unregisterBroadcastReceiver() {
-        Log.e(TAG, "Un-registering scale broadcast receiver");
+        Log.d(TAG, "Un-registering scale broadcast receiver");
         try {
             if (scaleBroadcastReceiver != null) {
                 LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(scaleBroadcastReceiver);
