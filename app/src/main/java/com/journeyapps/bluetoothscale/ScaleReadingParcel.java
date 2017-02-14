@@ -21,7 +21,7 @@ public class ScaleReadingParcel implements Parcelable, ScaleReading {
         this.zero = scaleReading.isZero();
     }
 
-    protected ScaleReadingParcel(Parcel source) {
+    private ScaleReadingParcel(Parcel source) {
         /**
          * NB: the order in which values is read must match the order in which they are written exactly:
          * `writeToParcel(Parcel dest, int flags)`
