@@ -90,6 +90,11 @@ public class BluetoothService {
         setState(ConnectionState.CONNECTED);
     }
 
+    public void sendZeroInstruction() {
+        Log.i(TAG, "BluetoothService sendZeroInstruction");
+        this.bluetoothConnectedThread.sendZeroInstruction();
+    }
+
     private synchronized void close() {
         if(this.bluetoothServiceThread != null) {
             this.bluetoothServiceThread.closeSocket();

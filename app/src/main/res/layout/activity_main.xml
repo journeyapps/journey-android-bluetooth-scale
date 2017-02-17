@@ -22,6 +22,11 @@
         android:layout_height="wrap_content"
         android:onClick="disconnectScale"
         android:text="Disconnect Scale"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="sendZeroInstruction"
+        android:text="Set Zero"/>
     <TextView
         android:textSize="30dp"
         android:text="0.0"
