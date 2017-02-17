@@ -3,8 +3,10 @@ package com.journeyapps.bluetoothscale;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,28 +14,35 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ScaleUpdateCallback {
     private static final String TAG = "JOURNEYAPPSSCALE";
-    private BluetoothAdapter adapter;
-    private BluetoothService bluetoothService;
-    private final Handler handler;
+    private BluetoothAdapter adapter = null;
+    private BluetoothService bluetoothService = null;
 
-    public TextView scaleValueText;
-    public TextView isZero;
-    public TextView isStable;
-    public TextView connectionStatus;
+    private TextView scaleValueText;
+    private TextView isZero;
+    private TextView isStable;
+    private TextView connectionStatus;
 
-    public MainActivity() {
-        this.adapter = null;
-        this.bluetoothService = null;
-        this.handler = new BluetoothHandler(this);
-    }
+    private ScaleBroadcastReceiver scaleBroadcastReceiver;
+
+    private Intent scaleBroadcastServiceIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        this.scaleValueText = (TextView) findViewById(R.id.measured_value);
+        this.isZero = (TextView) findViewById(R.id.zero);
+        this.isStable = (TextView) findViewById(R.id.stable);
+        this.connectionStatus = (TextView) findViewById(R.id.connected);
+
+        scaleBroadcastServiceIntent = new Intent(this, ScaleBroadcastService.class);
+        startService(scaleBroadcastServiceIntent);
     }
 
     public void connectToScale(View view) {
@@ -73,22 +82,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupBluetooth() {
-        this.scaleValueText = (TextView) findViewById(R.id.measured_value);
-        this.isZero = (TextView) findViewById(R.id.zero);
-        this.isStable = (TextView) findViewById(R.id.stable);
-        this.connectionStatus = (TextView) findViewById(R.id.connected);
-
-        this.bluetoothService = new BluetoothService(this, this.handler);
+        BluetoothHandler handler = new BluetoothHandler(this.getApplicationContext());
+        this.bluetoothService = new BluetoothService(handler);
     }
 
+    @Override
     public void onStart() {
         super.onStart();
         Log.i(TAG, "onStart");
         setupBluetooth();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerBroadcastReceiver();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        unregisterBroadcastReceiver();
+    }
+
+    @Override
+    public void onStop() {
+        Log.d(TAG, "onStop");
+        super.onStop();
+    }
+
+    @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
+        stopService(scaleBroadcastServiceIntent);
         if(this.bluetoothService != null) {
             this.bluetoothService.stop();
         }
@@ -104,7 +131,47 @@ public class MainActivity extends AppCompatActivity {
         this.bluetoothService.sendZeroInstruction();
     }
 
-    public void showConnectionStatus(String status) {
-        this.connectionStatus.setText(status);
+    private void registerBroadcastReceiver() {
+        IntentFilter broadcastFilter = new IntentFilter(ScaleBroadcastReceiver.SCALE_BROADCAST_ACTION);
+        scaleBroadcastReceiver = new ScaleBroadcastReceiver(this);
+        LocalBroadcastManager.getInstance(this).registerReceiver(scaleBroadcastReceiver, broadcastFilter);
+    }
+
+    private void unregisterBroadcastReceiver() {
+        try {
+            if (scaleBroadcastReceiver != null) {
+                LocalBroadcastManager.getInstance(this).unregisterReceiver(scaleBroadcastReceiver);
+                scaleBroadcastReceiver = null;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error attempting to unregister scale broadcast receiver", e);
+        }
+    }
+
+    @Override
+    public void handleState(BluetoothService.ConnectionState state) {
+        String statusString;
+        switch(state) {
+            case NOT_CONNECTED:
+                statusString = "Disconnected";
+                break;
+            case CONNECTING:
+                statusString = "Connecting";
+                break;
+            case CONNECTED:
+                statusString = "Connected";
+                break;
+            default:
+                statusString = "N/A";
+                break;
+        }
+        this.connectionStatus.setText(statusString);
+    }
+
+    @Override
+    public void handleScaleReading(ScaleReading scaleReading) {
+        this.scaleValueText.setText(String.format(Locale.getDefault(), "%.2f %s", scaleReading.getWeight(), scaleReading.getUnit()));
+        this.isZero.setText(scaleReading.isZero() ? "ZERO" : "");
+        this.isStable.setText(scaleReading.isStable() ? "STABLE" : "");
     }
 }

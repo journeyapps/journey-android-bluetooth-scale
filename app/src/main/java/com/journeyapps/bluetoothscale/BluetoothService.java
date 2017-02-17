@@ -49,8 +49,6 @@ public class BluetoothService {
 
     private BluetoothConnectedThread bluetoothConnectedThread;
 
-    private MainActivity mainActivity;
-
     private ConnectionState state;
 
     public Handler getHandler() {
@@ -65,8 +63,7 @@ public class BluetoothService {
         this.bluetoothServiceThread = bluetoothServiceThread;
     }
 
-    public BluetoothService(MainActivity mainActivity, Handler handler) {
-        this.mainActivity = mainActivity;
+    public BluetoothService(Handler handler) {
         this.handler = handler;
         this.state = ConnectionState.NOT_CONNECTED;
     }
@@ -111,7 +108,7 @@ public class BluetoothService {
 
     public final synchronized void stop() {
         Log.i(TAG, "BluetoothService stop()");
-        mainActivity.showConnectionStatus("Disconnected");
+        setState(ConnectionState.NOT_CONNECTED); // TODO: consider adding a DISCONNECTED state?
         this.close();
     }
 
